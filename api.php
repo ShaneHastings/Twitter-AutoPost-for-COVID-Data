@@ -7,7 +7,6 @@
  */
 
 require_once "vendor/autoload.php";
-
 use Abraham\TwitterOAuth\TwitterOAuth;
 
 define('CONSUMER_KEY', 'ENTER_YOUR_CONSUMER_KEY');
@@ -24,6 +23,8 @@ define('ACCESS_TOKEN_SECRET', 'ENTER_YOUR_ACCESS_TOKEN_SECRET');
 
 function sendTweet($tweetContent)
 {
+
+    /* Commented out for testing */
 
     //$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET);
 
@@ -95,16 +96,20 @@ function checkForUpdate()
             /* THIS SENDS THE TWEET! */
             echo "\nA tweet has not yet been sent. Sending now \n";
             sendTweet(generateTweetContent());
+
             echo generateTweetContent();
         }
     } /* Case 2a: The dates don't match. Swab data hasn't been updated OR it is a Sunday / non reporting day. Do nothing.*/
     else {
-        echo "The dates don't match. Keep checking.";
+        echo "The dates don't match. Keep checking.\n";
+        echo "Latest swab date: " . $swabData['date'];
+        echo "\nCurrent date: " . $dateToday;
     }
 
 }
 
-/*  Read the date file txt from when a successful tweet was last sent.
+/*  Read the contents of the lastTweet.txt file. This file contains the date (YYYY-MM-DD) of the last successful
+    tweet made for swabs. This ensures that swab data is only posted once to the Twitter account.
  */
 function readDateFromFile()
 {
