@@ -1,3 +1,4 @@
+
 ![Banner](https://i.imgur.com/Rl3wFFu.png)
 
 # Twitter-AutoPost-for-COVID-Data
@@ -12,6 +13,11 @@ Posting case data is a bit pointless since this is released by the media before 
 - PHP 7.3.0+
 - [TwitterOAuth](https://github.com/abraham/twitteroauth)
 - A [Twitter Developer account](https://developer.twitter.com/en/apply-for-access)
+
+# Crontab
+
+    * * * * * php /path/to/api.php >> /path/to/logfile
+
 
 # Sample Output
 The output post on Twitter will be something similar to this. Currently, a simple text tweet is sent however I want to add support for case/swab graphs in the future.
