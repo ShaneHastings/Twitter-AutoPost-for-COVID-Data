@@ -6,13 +6,14 @@
  *  @version 0.1
  */
 
+date_default_timezone_set('Europe/Dublin');
 require_once "vendor/autoload.php";
 use Abraham\TwitterOAuth\TwitterOAuth;
 
-define('CONSUMER_KEY', 'ENTER_YOUR_CONSUMER_KEY');
-define('CONSUMER_SECRET', 'ENTER_YOUR_CONSUMER_SECRET');
-define('ACCESS_TOKEN', 'ENTER_YOUR_ACCESS_TOKEN');
-define('ACCESS_TOKEN_SECRET', 'ENTER_YOUR_ACCESS_TOKEN_SECRET');
+define('CONSUMER_KEY', '');
+define('CONSUMER_SECRET', '');
+define('ACCESS_TOKEN', '');
+define('ACCESS_TOKEN_SECRET', '');
 
 
 /*  Posts a tweet to the @COVID19DataIE twitter account with the data given
@@ -24,12 +25,9 @@ define('ACCESS_TOKEN_SECRET', 'ENTER_YOUR_ACCESS_TOKEN_SECRET');
 function sendTweet($tweetContent)
 {
 
-    /* Commented out for testing */
-
-    //$connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET);
-
-    //$status = $tweetContent;
-    //$post_tweets = $connection->post("statuses/update", ["status" => $status]);
+    $connection = new TwitterOAuth(CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_TOKEN_SECRET);
+    $status = $tweetContent;
+    $post_tweets = $connection->post("statuses/update", ["status" => $status]);
 
     /* We will create / write a file called lastTweet.txt containing only the date of when the tweet was sent.
         This allows us to check if a tweet has been sent that day or not.
@@ -67,8 +65,7 @@ function generateTweetContent()
 
     /* Formatting the tweet string */
     $swabDate = date("l, F jS Y", strtotime($swabData['date']));
-    $tweetString = $swabData['positive_swabs'] . " positive swabs, " . $swabData['positivity_rate'] . " positivity on " . number_format($swabData['swabs_24hr']) . " swabs.\n- " . $swabDate . "\n\n#COVID19Ireland";
-    //echo $tweetString;
+    $tweetString = $swabData['positive_swabs'] . " positive swabs, " . $swabData['positivity_rate'] . " positivity on " . number_format($swabData['swabs_24hr']) . " swabs." . chr(13) . chr(10) ."- " . $swabDate . chr(13) . chr(10) ."#COVID19Ireland";
     return $tweetString;
 
 }
@@ -95,9 +92,10 @@ function checkForUpdate()
         } else if ($lastTweetDate != $dateToday) {
             /* THIS SENDS THE TWEET! */
             echo "\nA tweet has not yet been sent. Sending now \n";
-            sendTweet(generateTweetContent());
+            $tweetContent = generateTweetContent();
+            sendTweet($tweetContent);
 
-            echo generateTweetContent();
+            echo $tweetContent;
         }
     } /* Case 2a: The dates don't match. Swab data hasn't been updated OR it is a Sunday / non reporting day. Do nothing.*/
     else {
@@ -121,5 +119,55 @@ function readDateFromFile()
 
 }
 
-checkForUpdate();
+/*  Check if a given time is between two times.
+ *  Courtesy of: https://stackoverflow.com/questions/27131527/php-check-if-time-is-between-two-times-regardless-of-date
+ */
+function timeIsBetweenTwoTimes($from, $till, $input) {
+    $f = DateTime::createFromFormat('H:i:s', $from);
+    $t = DateTime::createFromFormat('H:i:s', $till);
+    $i = DateTime::createFromFormat('H:i:s', $input);
+    if ($f > $t) $t->modify('+1 day');
+    return ($f <= $i && $i <= $t) || ($f <= $i->modify('+1 day') && $i <= $t);
+}
+
+/*  Since this is running through cron, we only want to actually poll the API when there is likely to be
+ *  an update. This API updates between 3-4PM Monday - Saturday. So, this is when we will check.
+ *  For fallback purposes, we'll check between 15:00 and 16:30.
+ */
+
+function isDateTimeValid(){
+
+    $timeNow = date("H:i:s");
+    $dateToday = date("Y-m-d");
+    $lastTweetDate = readDateFromFile();
+
+    /* The times we are checking for data between. */
+    $timeIntervalStart = "15:00:00";
+    $timeInternalEnd = "16:30:00";
+
+    /* Check if a tweet has already been sent today */
+    if ($lastTweetDate == $dateToday) {
+        echo "A tweet has already been sent today" . $lastTweetDate . "\n\n";
+        //die();
+    }
+    /* Is it Sunday? */
+    else if(date('D') == 'Sun'){
+        echo "It's Sunday. Stopping further checks.";
+        //die();
+    }
+    /* A tweet hasn't been sent today and its not a Sunday. So, is the time right?
+        If yes, check for an update. */
+    else if(timeIsBetweenTwoTimes($timeNow, $timeIntervalStart, $timeInternalEnd)){
+        checkForUpdate();
+    } else {
+        echo "The current time falls outside of the 15:00 - 16:30 range.";
+    }
+
+}
+
+/* Run program. */
+echo "Executing checks...\n";
+isDateTimeValid();
+echo "\n\nLast run at " . date("Y-m-d H:i:s") . "\n\n";
+
 
