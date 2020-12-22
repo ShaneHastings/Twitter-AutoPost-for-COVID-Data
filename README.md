@@ -30,3 +30,7 @@ The output post on Twitter will be something similar to this. Currently, a simpl
 The API queried by this repo is my own, which is a cleansed version of the [LaboratoryLocalTimeSeriesHistoricView](https://covid19ireland-geohive.hub.arcgis.com/datasets/f6d6332820ca466999dbd852f6ad4d5a_0/) dataset from [*Ireland's COVID-19 Data Hub*](https://covid19ireland-geohive.hub.arcgis.com/). 
 
 You can view my dashboard [here](https://covid19.shanehastings.eu/api/swabs/).
+
+## Further Reading
+
+[Available here :)](https://shanehastings.eu/blog/?post=@covid19dataie)
