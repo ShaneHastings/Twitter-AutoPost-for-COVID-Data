@@ -9,7 +9,7 @@ Posting case data is a bit pointless since this is released by the media before 
 
 # Requirements
 
-- PHP
+- PHP 7.3.0+
 - [TwitterOAuth](https://github.com/abraham/twitteroauth)
 - A [Twitter Developer account](https://developer.twitter.com/en/apply-for-access)
 
