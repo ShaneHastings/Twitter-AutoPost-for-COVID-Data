@@ -1,4 +1,5 @@
 
+
 ![Banner](https://i.imgur.com/Rl3wFFu.png)
 
 # Twitter-AutoPost-for-COVID-Data
@@ -24,6 +25,9 @@ The output post on Twitter will be something similar to this. Currently, a simpl
 
 ![Sample Tweet](https://i.imgur.com/6BvTrn8.png)
 *Obviously, the twitter account is not **actually** verified.*
+
+# Pending Features
+- Vaccine Rollout Milestones ([see more](https://github.com/ShaneHastings/Twitter-AutoPost-for-COVID-Data/issues/1))
 
 # Data Source
 
